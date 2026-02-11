@@ -1,6 +1,8 @@
 ---
-- name: Installing Java
-  shell : sudo amazon-linux-extras install java-openjdk11 -y
+- name: Install Java OpenJDK 11
+  dnf:
+    name: java-11-amazon-corretto-devel
+    state: present
 
 - name: add group "tomcat"
   group: name=tomcat
