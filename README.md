@@ -98,7 +98,11 @@ vi /etc/ansible/hosts
 
 ```ini
 [agents]
-13.234.119.49 ansible_user=root
+[agents]
+agent ansible_host=54.159.58.173 ansible_user=root
+
+[master]
+master ansible_host=54.166.248.125 ansible_user=root
 ```
 
 > Add all agent IPs under a group name (e.g., `[agents]`). You can define multiple groups.
