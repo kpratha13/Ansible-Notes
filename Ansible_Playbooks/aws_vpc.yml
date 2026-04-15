@@ -3,6 +3,21 @@
   connection: local
   gather_facts: false
   tasks:
+    - name: Pip installation
+      yum:
+        name:
+          - python3-pip
+          - python3-devel
+        state: present
+
+    - name: Ensure Python dependencies are installed
+      pip:
+        name:
+          - boto3
+          - botocore
+        executable: pip3
+        state: present 
+
     - name: Create a new VPC
       amazon.aws.ec2_vpc_net:
         name: my-ansible-vpc
