@@ -2,21 +2,29 @@
 - hosts: localhost
   connection: local
   gather_facts: False
-  
+
   vars:
-    keypair: rajavan
+    keypair: ansible_practice
     instance_type: t2.micro
-    image: "ami-0b6c6ebed2801a5cb"
+    image: "ami-098e39bafa7e7303d"
     region: us-east-1
-    user_access_key: "xxxxxxxxxxxxxx"
-    user_secret_key: "xxxxxxxxxxxxxxxx"
+    user_access_key: "xxxxxxxxxxxxxxxxxx"
+    user_secret_key: "xxxxxxxxxxxxxxxxxx"
 
   tasks:
+    - name: Pip installation
+      yum:
+        name:
+          - python3-pip
+          - python3-devel
+        state: present
+
     - name: Ensure Python dependencies are installed
       pip:
-        name: 
+        name:
           - boto3
           - botocore
+        executable: pip3
         state: present
 
     - name: Launch AWS EC2 Instance
