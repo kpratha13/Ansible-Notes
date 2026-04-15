@@ -41,4 +41,4 @@
 
     - name: Display Public IP
       debug:
-        msg: "Server is up! IP: {{ ec2_result.instances[0].public_ip }}"
+        msg: "Server is up! IP: {{ ec2_result.instances[0].public_ip_address }}"
