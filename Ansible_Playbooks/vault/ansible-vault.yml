@@ -7,5 +7,5 @@
   tasks:
   - name: clone a repo
     git:
-      repo: https://github.com/{{ password }}/AnsiblePlaybooks
-      dest: /opt/AnsiblePlaybooks
+      repo: https://github.com/{{ password }}/Ansible-Notes
+      dest: /opt/Ansible-Notes
