@@ -19,9 +19,3 @@
     name: jenkins
     state: latest
   notify: Restart jenkins
-
-handlers:
-  - name: Restart jenkins
-    service:
-      name: jenkins
-      state: restarted
