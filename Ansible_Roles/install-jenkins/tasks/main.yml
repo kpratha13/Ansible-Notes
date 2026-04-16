@@ -18,4 +18,25 @@
   dnf:
     name: jenkins
     state: latest
-  notify: Restart jenkins
+
+- name: Ensure Jenkins directories have correct ownership
+  file:
+    path: "{{ item }}"
+    owner: jenkins
+    group: jenkins
+    state: directory
+    recurse: yes
+  loop:
+    - /var/lib/jenkins
+    - /var/cache/jenkins
+    - /var/log/jenkins
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Restart Jenkins service
+  systemd:
+    name: jenkins
+    state: restarted
+    enabled: yes
