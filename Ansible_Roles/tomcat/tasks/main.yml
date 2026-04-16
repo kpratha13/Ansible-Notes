@@ -57,11 +57,15 @@
       Type=forking
       User=tomcat
       Group=tomcat
-      # FIXED: Updated to Java 17 path
-      Environment="JAVA_HOME=/usr/lib/jvm/jre-17"
+      
+      # Use the absolute path to ensure no version confusion
+      Environment="JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.x86_64"
       Environment="CATALINA_PID=/usr/share/tomcat/temp/tomcat.pid"
       Environment="CATALINA_HOME=/usr/share/tomcat"
       Environment="CATALINA_BASE=/usr/share/tomcat"
+      # Adding extra memory parameters can help avoid silent startup crashes
+      Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+
       ExecStart=/usr/share/tomcat/bin/startup.sh
       ExecStop=/usr/share/tomcat/bin/shutdown.sh
 
