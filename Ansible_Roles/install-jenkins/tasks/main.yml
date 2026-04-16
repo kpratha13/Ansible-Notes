@@ -1,80 +1,51 @@
 ---
-- name: Install Java 17 for Tomcat
+- name: Install Java 21 for Jenkins
   dnf:
-    name: java-17-amazon-corretto-devel
+    name: java-21-amazon-corretto-devel
     state: present
 
-- name: Create Tomcat Group
-  group:
-    name: tomcat
+- name: Download Jenkins Repo
+  get_url:
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+
+- name: Import Jenkins GPG Key
+  rpm_key:
     state: present
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
-- name: Create Tomcat User
-  user:
-    name: tomcat
-    group: tomcat
-    home: /usr/share/tomcat
-    create_home: no
-    shell: /bin/false
+- name: Install Jenkins
+  dnf:
+    name: jenkins
+    state: latest
 
-- name: Download and Extract Tomcat 9
-  unarchive:
-    src: https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.98/bin/apache-tomcat-9.0.98.tar.gz
-    dest: /opt/
-    remote_src: yes
-    owner: tomcat
-    group: tomcat
-    creates: /opt/apache-tomcat-9.0.98/bin/startup.sh
-
-- name: Symlink Tomcat directory
+- name: Create Systemd Override Directory
   file:
-    src: /opt/apache-tomcat-9.0.98
-    path: /usr/share/tomcat
-    state: link
-    owner: tomcat
-    group: tomcat
+    path: /etc/systemd/system/jenkins.service.d
+    state: directory
 
-- name: Configure Tomcat server and users
-  template:
-    src: "{{ item.src }}"
-    dest: "/usr/share/tomcat/conf/{{ item.dest }}"
-    owner: tomcat
-    group: tomcat
-  loop:
-    - { src: 'server.xml.j2', dest: 'server.xml' }
-    - { src: 'tomcat-users.xml.j2', dest: 'tomcat-users.xml' }
-
-- name: Install Tomcat Systemd Service
+- name: Configure Jenkins Java 21 and Port Override
   copy:
-    dest: /etc/systemd/system/tomcat.service
+    dest: /etc/systemd/system/jenkins.service.d/override.conf
     content: |
-      [Unit]
-      Description=Apache Tomcat 9 Web Application Container
-      After=network.target
-
       [Service]
-      Type=forking
-      User=tomcat
-      Group=tomcat
-      Environment="JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.x86_64"
-      Environment="CATALINA_PID=/usr/share/tomcat/temp/tomcat.pid"
-      Environment="CATALINA_HOME=/usr/share/tomcat"
-      Environment="CATALINA_BASE=/usr/share/tomcat"
-      ExecStart=/usr/share/tomcat/bin/startup.sh
-      ExecStop=/usr/share/tomcat/bin/shutdown.sh
+      Environment="JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto.x86_64"
+      Environment="JENKINS_PORT=8081"
 
-      [Install]
-      WantedBy=multi-user.target
+- name: Ensure Jenkins ownership
+  file:
+    path: "{{ item }}"
+    owner: jenkins
+    group: jenkins
+    recurse: yes
+  loop:
+    - /var/lib/jenkins
+    - /var/cache/jenkins
+    - /var/log/jenkins
 
-- name: Start and Enable Tomcat
+- name: Start Jenkins
   systemd:
-    name: tomcat
+    name: jenkins
     state: restarted
     enabled: yes
     daemon_reload: yes
-
-- name: Wait for tomcat to start
-  wait_for:
-    port: 8090
-    delay: 5
-    timeout: 60
