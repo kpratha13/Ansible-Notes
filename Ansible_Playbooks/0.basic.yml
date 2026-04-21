@@ -1,5 +1,5 @@
 --- #
 - hosts: all
   tasks:
-  - name: Querying for nmap Install
-    yum: pkg=nmap state=present
+  - name: Install nmap tool
+    yum: name=nmap state=present
